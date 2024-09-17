@@ -1,0 +1,104 @@
+version: '1.0'
+
+services:
+    eureka-sv:
+        build: eureka-sv
+        mem_limit: 512m
+        ports:
+            - "8761:8761"
+        networks:
+            - 'microelectro-network'
+    product-service:
+        build: product-service
+        mem_limit: 512m
+        ports:
+            - "9001:9001"
+        networks:
+            - 'microelectro-network'
+        environment:
+            DB_URL_PRODUCT: jdbc:mysql://product_db:3306/product_service?createDatabaseIfNotExist=true&serverTimezone=UTC
+            DB_USER_NAME: root
+            DB_PASSWORD: root
+            SERV_URL: http://eureka-sv:8761/eureka
+        depends_on:
+            product_db:
+                condition: service_healthy
+    cart-service:
+        build: cart-service
+        mem_limit: 512m
+        ports:
+            - "9002:9002"
+        networks:
+            - 'microelectro-network'
+        environment:
+            DB_URL_CART: jdbc:mysql://cart_db:3308/cart_service?createDatabaseIfNotExist=true&serverTimezone=UTC
+            DB_USER_NAME: root
+            DB_PASSWORD: root
+            SERV_URL: http://eureka-sv:8761/eureka
+        depends_on:
+            cart_db:
+                condition: service_healthy
+    sale-service:
+        build: sale-service
+        mem_limit: 512m
+        ports:
+            - "9003:9003"
+        networks:
+            - 'microelectro-network'
+        environment:
+            DB_URL_SALE: jdbc:mysql://sale_db:3310/sale_service?createDatabaseIfNotExist=true&serverTimezone=UTC
+            DB_USER_NAME: root
+            DB_PASSWORD: root
+            SERV_URL: http://eureka-sv:8761/eureka
+        depends_on:
+            sale_db:
+                condition: service_healthy
+    api-gateway-electro:
+        build: api-gateway-electro
+        mem_limit: 512m
+        ports:
+            - "443:443"
+        environment:
+            URI_PRODUCT: http://eureka-sv:9001
+            URI_CART: http://eureka-sv:9002
+            URI_SALE: http://eureka-sv:9003
+        networks:
+            - 'microelectro-network'
+    product_db:
+        image: mysql:8.3.0
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_PASSWORD: root
+            MYSQL_DATABASE: product_service
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            timeout: 10s
+            retries: 5
+    cart_db:
+        image: mysql:8.3.0
+        ports:
+            - "3309:3308"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_PASSWORD: root
+            MYSQL_DATABASE: cart_service
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            timeout: 10s
+            retries: 5
+    sale_db:
+        image: mysql:8.3.0
+        ports:
+            - "3311:3310"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_PASSWORD: root
+            MYSQL_DATABASE: sale_service
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            timeout: 10s
+            retries: 5
+networks:
+    microelectro-network:
