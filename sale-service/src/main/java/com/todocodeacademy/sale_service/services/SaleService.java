@@ -24,6 +24,8 @@ public class SaleService implements ISaleService{
 
     @Override
     public Sale saveSale(Sale sale) {
+
+        sale.setDate(LocalDate.now());
         return saleRepo.save(sale);
     }
 
