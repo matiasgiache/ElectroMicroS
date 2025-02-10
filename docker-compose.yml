@@ -69,9 +69,9 @@ services:
             - product-service
             - eureka-sv
         environment:
-            URI_PRODUCT: http://eureka-sv:9001
-            URI_CART: http://eureka-sv:9002
-            URI_SALE: http://eureka-sv:9003
+            URI_PRODUCT: lb://product-service
+            URI_CART: lb://cart-service
+            URI_SALE: lb://sale-service
             DEFAULT_ZONE: http://eureka-sv:8761/eureka
         networks:
             - 'microelectro-network'
