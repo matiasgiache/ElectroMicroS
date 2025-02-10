@@ -156,7 +156,7 @@ curl -X POST http://localhost:443/cart/put/1/Laptop \
   
 Realizar una Venta
 
-curl -X POST http://localhost:8080/sale/create \
+curl -X POST http://localhost:443/sale/create \
   -H "Content-Type: application/json" \
   -d '{
         "cart_id": 1
